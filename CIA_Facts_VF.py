@@ -391,22 +391,22 @@ def main_content_area(selection, country_selected, df):
         
         st.write("-----")  # Add a separator  
         st.write("\n")
-        st.write("### Feature Interactions & Relationships")
-        st.write("Explore how two features interact with each other. Gain insights into the relationships and trends among different features.")
+        # st.write("### Feature Interactions & Relationships")
+        # st.write("Explore how two features interact with each other. Gain insights into the relationships and trends among different features.")
 
-        # Selecting two features
-        feature_x = st.selectbox('Select Feature on X-axis:', numerical_columns, index=0)
-        feature_y = st.selectbox('Select Feature on Y-axis:', numerical_columns, index=1)
+        # # Selecting two features
+        # feature_x = st.selectbox('Select Feature on X-axis:', numerical_columns, index=0)
+        # feature_y = st.selectbox('Select Feature on Y-axis:', numerical_columns, index=1)
 
-        # Scatter plot with a trendline
-        scatter_fig = px.scatter(df, x=feature_x, y=feature_y, trendline="ols", title=f'Relationship between {feature_x} and {feature_y}')
-        st.plotly_chart(scatter_fig)
+        # # Scatter plot with a trendline
+        # scatter_fig = px.scatter(df, x=feature_x, y=feature_y, trendline="ols", title=f'Relationship between {feature_x} and {feature_y}')
+        # st.plotly_chart(scatter_fig)
 
 
 
-        st.write("-----")  # Add a separator  
+        # st.write("-----")  # Add a separator  
 
-        st.write("\n")
+        # st.write("\n")
 
         # Ranked Feature Comparison
         st.write("### Ranked Feature Comparison")
