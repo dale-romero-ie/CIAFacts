@@ -16,6 +16,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestRegressor
 
+openai_api_key = st.secrets["openai"]["api_key"]
 
 #Loading Media
 image1=Image.open('image1.png')
@@ -113,9 +114,9 @@ def load_model():
 
 
 # Function to generate facts using GPT API
-def generate_facts(country, api_key):
+def generate_facts(country, openai_api_key):
     headers = {
-        'Authorization': f'Bearer {api_key}',
+        'Authorization': f'Bearer {openai_api_key}',
     }
     data = {
         'model': 'gpt-3.5-turbo',
@@ -222,10 +223,11 @@ def main_content_area(selection, country_selected, df):
                 with st.expander("Current Facts"):
                     st.write(f"**Current Situation in {country_selected}**")
                     st.write("Dive deeper into the present state of affairs in the selected country. This section fetches real-time insights using an external AI model, so it might take a moment to load. Your patience is appreciated.")
-                    with open('key.txt', 'r') as file:
-                        api_key = file.read().strip()
+                    # DR: Commented out because of TOML file
+                    # with open('key.txt', 'r') as file:
+                    #     api_key = file.read().strip()
                     if st.button('More Facts'):
-                        facts = generate_facts(country_selected, api_key)
+                        facts = generate_facts(country_selected, openai_api_key)
                         st.info(facts)
 
             else:
