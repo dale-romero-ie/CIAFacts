@@ -439,16 +439,16 @@ def main_content_area(selection, country_selected, df):
 
         #     st.pyplot(fig)
 
-    import geopandas as gpd
+#     import geopandas as gpd
 
-# Load a world map shapefile
-    world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+# # Load a world map shapefile
+#     world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
 
-# Create a function to plot the map
-    def plot_country_map(country_name):
-        country = world[world['name'] == country_name]
-        fig = px.choropleth(country, geojson=country.geometry, locations=country.index, title=f"Map of {country_name}")
-        st.plotly_chart(fig)
+# # Create a function to plot the map
+#     def plot_country_map(country_name):
+#         country = world[world['name'] == country_name]
+#         fig = px.choropleth(country, geojson=country.geometry, locations=country.index, title=f"Map of {country_name}")
+#         st.plotly_chart(fig)
 
 # # In the "Country Insights" section, use the function to plot the map
 #     if selection == "Country Insights":
