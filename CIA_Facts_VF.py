@@ -227,7 +227,7 @@ def main_content_area(selection, country_selected, df):
                     with open('key.txt', 'r') as file:
                         api_key = file.read().strip()
                     if st.button('More Facts'):
-                        facts = generate_facts(country_selected, api_key)
+                        facts = generate_facts(country_selected, openai_api_key)
                         st.info(facts)
 
             else:
