@@ -16,6 +16,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestRegressor
 
+openai_api_key = st.secrets["openai"]["api_key"]
+
 
 #Loading Media
 image1=Image.open('image1.png')
@@ -113,9 +115,9 @@ def load_model():
 
 
 # Function to generate facts using GPT API
-def generate_facts(country, api_key):
+def generate_facts(country, openai_api_key):
     headers = {
-        'Authorization': f'Bearer {api_key}',
+        'Authorization': f'Bearer {openai_api_key}',
     }
     data = {
         'model': 'gpt-3.5-turbo',
