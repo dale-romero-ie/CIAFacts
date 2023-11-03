@@ -16,7 +16,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestRegressor
 
-openai_api_key = st.secrets["openai"]["api_key"]
 
 #Loading Media
 image1=Image.open('image1.png')
@@ -114,9 +113,9 @@ def load_model():
 
 
 # Function to generate facts using GPT API
-def generate_facts(country, openai_api_key):
+def generate_facts(country, api_key):
     headers = {
-        'Authorization': f'Bearer {openai_api_key}',
+        'Authorization': f'Bearer {api_key}',
     }
     data = {
         'model': 'gpt-3.5-turbo',
@@ -223,15 +222,14 @@ def main_content_area(selection, country_selected, df):
                 with st.expander("Current Facts"):
                     st.write(f"**Current Situation in {country_selected}**")
                     st.write("Dive deeper into the present state of affairs in the selected country. This section fetches real-time insights using an external AI model, so it might take a moment to load. Your patience is appreciated.")
-                    # DR: Commented out because of TOML file
-                    # with open('key.txt', 'r') as file:
-                    #     api_key = file.read().strip()
+                    with open('key.txt', 'r') as file:
+                        api_key = file.read().strip()
                     if st.button('More Facts'):
-                        facts = generate_facts(country_selected, openai_api_key)
+                        facts = generate_facts(country_selected, api_key)
                         st.info(facts)
 
             else:
-                st.warning("Country not found!")
+                st.info("Input your country here!")
 
 
         st.write("-----")  # Add a separator
@@ -323,6 +321,9 @@ def main_content_area(selection, country_selected, df):
         st.write("Select from a list of numerical features to customize your analysis. Multiple selections are possible.")
         important_features = ['Population', 'Area (sq. mi.)', 'GDP ($ per capita)', 'Literacy (%)']
         feature = st.multiselect('Select features to analyze:', numerical_columns, default=important_features)
+        if not feature:
+            st.warning("Please select at least one feature to analyze.")
+            return
 
         st.write("\n")
 
@@ -377,6 +378,10 @@ def main_content_area(selection, country_selected, df):
         st.write("Get an overview of the distribution of a particular feature across all regions in a single view.")
         distribution_feature = st.selectbox('Select a feature for distribution analysis:', numerical_columns)
         selected_regions_for_distribution = st.multiselect('Select regions to compare:', df['Region'].unique(), default=df['Region'].unique())
+        # If no regions are selected, show a warning and stop further execution
+        if not selected_regions_for_distribution:
+            st.warning("Please select at least one region for distribution analysis.")
+            return
         distribution_type = st.selectbox('Choose distribution visualization type:', ['Boxplot', 'Violin Plot'])
 
         # Filter data based on the regions selected
@@ -391,37 +396,48 @@ def main_content_area(selection, country_selected, df):
         
         st.write("-----")  # Add a separator  
         st.write("\n")
-        # st.write("### Feature Interactions & Relationships")
-        # st.write("Explore how two features interact with each other. Gain insights into the relationships and trends among different features.")
+        st.write("### Feature Interactions & Relationships")
+        st.write("Explore how two features interact with each other. Gain insights into the relationships and trends among different features.")
 
-        # # Selecting two features
-        # feature_x = st.selectbox('Select Feature on X-axis:', numerical_columns, index=0)
-        # feature_y = st.selectbox('Select Feature on Y-axis:', numerical_columns, index=1)
+        # Selecting two features
+        feature_x = st.selectbox('Select Feature on X-axis:', numerical_columns, index=0)
+        feature_y = st.selectbox('Select Feature on Y-axis:', numerical_columns, index=1)
 
-        # # Scatter plot with a trendline
-        # scatter_fig = px.scatter(df, x=feature_x, y=feature_y, trendline="ols", title=f'Relationship between {feature_x} and {feature_y}')
-        # st.plotly_chart(scatter_fig)
+        # Scatter plot without a trendline
+        scatter_fig = px.scatter(df, x=feature_x, y=feature_y, title=f'Relationship between {feature_x} and {feature_y}')
+        st.plotly_chart(scatter_fig)
 
 
+        st.write("-----")  # Add a separator  
 
-        # st.write("-----")  # Add a separator  
-
-        # st.write("\n")
+        st.write("\n")
 
         # Ranked Feature Comparison
         st.write("### Ranked Feature Comparison")
         st.write("View the top regions based on a selected feature.")
+
         ranked_feature = st.selectbox('Select a feature to rank:', numerical_columns)
-        top_n = st.slider("Select the number of top countries/regions to display:", 2, 3, 5)
+        top_n = st.slider("Select the number of top countries/regions to display:", 2, 10, 5)
+
+        if 'Region' not in df.columns or ranked_feature not in df.columns:
+            st.error("The expected columns are not present in the dataframe.")
+            return
+
+        # Remove duplicates, if any, based on 'Region'
+        df = df.drop_duplicates(subset=['Region'], keep='first')
+
+        # Sort the data and get top_n values
         sorted_df = df.sort_values(by=ranked_feature, ascending=False).head(top_n)
+
+        # Create the bar chart
         fig_ranked = px.bar(sorted_df, x='Region', y=ranked_feature, title=f'Top {top_n} Regions by {ranked_feature}')
         st.plotly_chart(fig_ranked)
-        
+            
 
-    elif selection == "Country Insights":
-        st.write(f"## Insights for {country_selected}")
-        country_data = df[df['Country'] == country_selected]
-        st.table(country_data)  
+    #elif selection == "Country Insights":
+    #    st.write(f"## Insights for {country_selected}")
+    #    country_data = df[df['Country'] == country_selected]
+    #    st.table(country_data)  
         
         #Commented out per Ana
         # with st.container():
@@ -501,6 +517,7 @@ def main_content_area(selection, country_selected, df):
             
             
     elif selection == "Custom SQL Queries":
+        st.write("This section allows you to execute custom SQL queries on the data. Please provide your SQL query in the input box and press 'Execute' to see the results.")
                    
         # SQL results
         query = st.sidebar.text_input('SQL Query:', 'SELECT * FROM data LIMIT 5')
